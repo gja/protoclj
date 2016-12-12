@@ -1,5 +1,8 @@
 (ns protoclj.reflection
-  (:import [com.google.protobuf GeneratedMessage GeneratedMessageV3 GeneratedMessage$Builder ByteString]
+  (:import [com.google.protobuf
+            GeneratedMessage GeneratedMessageV3
+            GeneratedMessage$Builder GeneratedMessageV3$Builder
+            ByteString]
            [java.lang.reflect Method]
            [java.lang Iterable]))
 
@@ -21,7 +24,8 @@
   "Check if the given class is part of an internal function"
   [^Class type]
   (or (= ByteString type)
-      (= GeneratedMessage$Builder (.getSuperclass type))))
+      (= GeneratedMessage$Builder (.getSuperclass type))
+      (= GeneratedMessageV3$Builder (.getSuperclass type))))
 
 (defn- regular-attribute
   "Build a map representing a regular attribute"
