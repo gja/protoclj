@@ -2,6 +2,8 @@
   (:import [com.google.protobuf GeneratedMessage GeneratedMessage$Builder ByteString]
            [java.lang Iterable]))
 
+(set! *warn-on-reflection* true)
+
 (defn- keywordize-fn
   "Returns a keyword name from a function getFooBar -> :foo-bar"
   [^java.lang.reflect.Method fn]
