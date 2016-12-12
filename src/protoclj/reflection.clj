@@ -1,5 +1,5 @@
 (ns protoclj.reflection
-  (:import [com.google.protobuf GeneratedMessage GeneratedMessage$Builder ByteString]
+  (:import [com.google.protobuf GeneratedMessage GeneratedMessageV3 GeneratedMessage$Builder ByteString]
            [java.lang Iterable]))
 
 (defn- keywordize-fn
@@ -50,6 +50,8 @@
      :type type
      :attribute-type :repeated}))
 
+(def internal-name #{"setField" "setRepeatedField" "setUnknownFields"})
+
 (defn proto-attributes
   "Get a list of interesting attributes for the class.
   Currently done by seeing all setters.
@@ -67,7 +69,8 @@
           :let [kw (keywordize-fn function)
                 param-types (.getParameterTypes function)
                 type (last param-types)]
-          :when (not (internal-setter? type))]
+          :when (not (internal-setter? type))
+          :when (not (contains? internal-name (.getName function)))]
       (if (= 1 (count param-types))
         (regular-attribute kw read-interface builder-clazz function type)
         (repeated-attribute kw read-interface builder-clazz (.getName function) type)))))
@@ -100,7 +103,8 @@
 
     (for [^Class clazz classes
           :let [enum? (.isEnum clazz)
-                message? (= GeneratedMessage (.getSuperclass clazz))]
+                message? (or (= GeneratedMessage (.getSuperclass clazz))
+                             (= GeneratedMessageV3 (.getSuperclass clazz)))]
           :when (or message? enum?)
           :let [class-sym (symbol (.getName clazz))]]
       {:name class-sym
