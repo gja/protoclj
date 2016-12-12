@@ -1,6 +1,9 @@
 (ns protoclj.reflection
   (:import [com.google.protobuf GeneratedMessage GeneratedMessageV3 GeneratedMessage$Builder ByteString]
+           [java.lang.reflect Method]
            [java.lang Iterable]))
+
+(set! *warn-on-reflection* true)
 
 (defn- keywordize-fn
   "Returns a keyword name from a function getFooBar -> :foo-bar"
@@ -65,15 +68,15 @@
              first)
         builder-clazz ^Class (-> clazz (.getMethod "newBuilder" nil) .getReturnType)]
     (for [function (.getDeclaredMethods builder-clazz)
-          :when (.startsWith (.getName function) "set")
+          :when (.startsWith (.getName ^Method function) "set")
           :let [kw (keywordize-fn function)
-                param-types (.getParameterTypes function)
+                param-types (.getParameterTypes ^Method function)
                 type (last param-types)]
           :when (not (internal-setter? type))
           :when (not (contains? internal-name (.getName function)))]
       (if (= 1 (count param-types))
         (regular-attribute kw read-interface builder-clazz function type)
-        (repeated-attribute kw read-interface builder-clazz (.getName function) type)))))
+        (repeated-attribute kw read-interface builder-clazz (.getName ^Method function) type)))))
 
 (defn- iterate-inner-classes [^Class root]
   (lazy-cat (cons root (mapcat iterate-inner-classes (.getDeclaredClasses root)))))
