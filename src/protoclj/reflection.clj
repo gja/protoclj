@@ -73,7 +73,7 @@
                 param-types (.getParameterTypes ^Method function)
                 type (last param-types)]
           :when (not (internal-setter? type))
-          :when (not (contains? internal-name (.getName function)))]
+          :when (not (contains? internal-name (.getName ^Method function)))]
       (if (= 1 (count param-types))
         (regular-attribute kw read-interface builder-clazz function type)
         (repeated-attribute kw read-interface builder-clazz (.getName ^Method function) type)))))
