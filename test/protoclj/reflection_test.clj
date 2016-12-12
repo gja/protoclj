@@ -3,7 +3,8 @@
             [clojure.test :refer :all])
   (:import [protoclj
             Sample1
-            Sample1$KeyValuePair]))
+            Sample1$KeyValuePair
+            Sample1$EmbeddedObject]))
 
 (deftest protobuf-classes-test
   (testing "it lists the classes"
@@ -25,6 +26,17 @@
     (is (= #{{:name :key :reader "getKey" :writer "setKey" :attribute-type :regular :type "java.lang.String"}
              {:name :value :reader "getValue" :writer "setValue" :attribute-type :regular :type "java.lang.String"}}
            (->> (proto-attributes Sample1$KeyValuePair)
+                (map (fn [m]
+                       {:name (:name-kw m)
+                        :reader (.getName (:reader m))
+                        :writer (.getName (:writer m))
+                        :type (.getName (:type m))
+                        :attribute-type (:attribute-type m)}))
+                (into #{})))))
+
+  (testing "it lists all the proto attributes for an embedded object"
+    (is (= #{{:name :obj, :reader "getObj", :writer "setObj", :type "protoclj.Sample1$EmbeddedObject$AnonymousObject", :attribute-type :regular}}
+           (->> (proto-attributes Sample1$EmbeddedObject)
                 (map (fn [m]
                        {:name (:name-kw m)
                         :reader (.getName (:reader m))
