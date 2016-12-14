@@ -1,4 +1,4 @@
-(defproject protoclj "0.2.1"
+(defproject protoclj "0.3.0"
   :description "A protobuffer compiler for clojure wrappers"
   :url "https://github.com/nilenso/protoclj"
   :license {:name "The MIT License"}
