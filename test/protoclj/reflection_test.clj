@@ -1,6 +1,7 @@
 (ns protoclj.reflection-test
   (:require [protoclj.reflection :refer :all]
-            [clojure.test :refer :all])
+            [clojure.test :refer :all]
+            [protoclj.protoclj-constants :as constants])
   (:import [protoclj
             Sample1
             Sample1$KeyValuePair
@@ -44,3 +45,8 @@
                         :type (.getName (:type m))
                         :attribute-type (:attribute-type m)}))
                 (into #{}))))))
+
+(deftest class-set-test
+  (testing "it creates a set of all classes that exist"
+    (is (= #{Sample1}
+           (constants/class-set protoclj.Sample1 protoclj.UnknownClass)))))

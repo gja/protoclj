@@ -1,10 +1,8 @@
 (ns protoclj.reflection
-  (:import [com.google.protobuf
-            GeneratedMessage GeneratedMessageV3
-            GeneratedMessage$Builder GeneratedMessageV3$Builder
-            ByteString]
+  (:import [com.google.protobuf ByteString]
            [java.lang.reflect Method]
-           [java.lang Iterable]))
+           [java.lang Iterable])
+  (:require [protoclj.protoclj-constants :as constants]))
 
 (set! *warn-on-reflection* true)
 
@@ -24,8 +22,7 @@
   "Check if the given class is part of an internal function"
   [^Class type]
   (or (= ByteString type)
-      (= GeneratedMessage$Builder (.getSuperclass type))
-      (= GeneratedMessageV3$Builder (.getSuperclass type))))
+      (contains? constants/generated-message-builder (.getSuperclass type))))
 
 (defn- regular-attribute
   "Build a map representing a regular attribute"
@@ -110,8 +107,7 @@
 
     (for [^Class clazz classes
           :let [enum? (.isEnum clazz)
-                message? (or (= GeneratedMessage (.getSuperclass clazz))
-                             (= GeneratedMessageV3 (.getSuperclass clazz)))]
+                message? (contains? constants/generated-messages (.getSuperclass clazz))]
           :when (or message? enum?)
           :let [class-sym (symbol (.getName clazz))]]
       {:name class-sym
